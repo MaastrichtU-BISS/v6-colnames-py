@@ -4,7 +4,7 @@ import time
 
 print("Attempt login to Vantage6 API")
 client = Client("http://localhost", 5000, "/api")
-client.authenticate("johan", "1234")
+client.authenticate("node1-user", "node1-password")
 
 client.setup_encryption(None)
 
@@ -19,10 +19,10 @@ print("Requesting to execute colnames algorithm")
 
 task = client.post_task(
     name="testing",
-    image="ghcr.io/MaastrichtU-BISS/v6-colnames-py",
-    collaboration_id=1,
+    image="jaspersnel/v6-colnames-py",
+    collaboration_id=client.collaboration.list()[0]['id'],
     input_= input_,
-    organization_ids=[1]
+    organization_ids=[client.collaboration.list()[0]['organizations'][0]['id']]
 )
 
 print("Wait and fetch results")
