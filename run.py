@@ -15,11 +15,11 @@ input_ = {
     "kwargs": {}
 }
 
-print("Requesting to execute summary algorithm")
+print("Requesting to execute colnames algorithm")
 
 task = client.post_task(
     name="testing",
-    image="docker.io/username/imagename",
+    image="ghcr.io/MaastrichtU-BISS/v6-colnames-py",
     collaboration_id=1,
     input_= input_,
     organization_ids=[1]
