@@ -9,7 +9,6 @@ server after encryption.
 """
 import time
 
-import pandas as pd
 from vantage6.tools.util import info, warn
 
 
@@ -30,7 +29,7 @@ def master(client, data, *args, **kwargs):
     # in this case
     info("Defining input parameters")
     input_ = {
-        "method": "some_example_method",
+        "method": "columnnames",
     }
 
     # create a new task for all organizations in the collaboration.
@@ -53,33 +52,23 @@ def master(client, data, *args, **kwargs):
 
     info("Obtaining results")
     results = client.get_results(task_id=task.get("id"))
-    print(results)
 
-    # combine all results into one dataframe
-    dfs = [pd.DataFrame.from_dict(res) for res in results]
-    res_df = pd.concat(dfs, keys=range(len(results)))
-    
-    # Calculate overall mean over all nodes
-    res_df['total_mean'] = res_df['count'] * res_df['mean']
-    res_total = pd.DataFrame(res_df.groupby(level=1).sum())
-    res_total['mean'] = res_total['total_mean'] / res_total['count']
-
-    info("master algorithm complete")
+    # Turn this into a nice dictionary along with a set to check which names
+    # the nodes have in common
+    results_dict = {f'node{i}': results[i] for i in range(len(results))}
+    results_dict['common'] = set([item for sublist in results for item in sublist])
 
     # return all the messages from the nodes
-    return res_total['mean'].to_dict()
+    return results_dict
 
-def RPC_some_example_method(data, *args, **kwargs):
-    """Some_example_method.
+def RPC_columnnames(data, *args, **kwargs):
+    """RPC_columnames.
 
     Do computation on data local to this node and send it back to 
     central server for further processing.
 
-    In this case, take mean `Age` on groups of different `Sex`
+    In this case simply create a list of columns
     """
-    info("Computing mean age for males and females")
-    result = data.groupby("Sex").Age.aggregate(['count', 'mean'])
+    result = list(data.columns)
 
-    # what you return here is send to the central server. So make sure
-    # no privacy sensitive data is shared
-    return result.to_dict()
+    return result
