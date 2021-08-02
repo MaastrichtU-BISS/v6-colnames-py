@@ -29,7 +29,7 @@ def master(client, data, *args, **kwargs):
     # in this case
     info("Defining input parameters")
     input_ = {
-        "method": "columnnames",
+        "method": "colnames",
     }
 
     # create a new task for all organizations in the collaboration.
@@ -56,13 +56,18 @@ def master(client, data, *args, **kwargs):
     # Turn this into a nice dictionary along with a set to check which names
     # the nodes have in common
     results_dict = {f'node{i}': results[i] for i in range(len(results))}
-    results_dict['common'] = set([item for sublist in results for item in sublist])
+    
+    intersect = set(results[0])
+    for result in results:
+        intersect = intersect.intersection(set(result))
 
-    # return all the messages from the nodes
+    results_dict['common'] = intersect
+
+    # return the lists + set
     return results_dict
 
-def RPC_columnnames(data, *args, **kwargs):
-    """RPC_columnames.
+def RPC_colnames(data, *args, **kwargs):
+    """RPC_colnames.
 
     Do computation on data local to this node and send it back to 
     central server for further processing.

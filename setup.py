@@ -15,12 +15,12 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 # setup the package
 setup(
-    name='v6-columnnames-py',
+    name='v6-colnames-py',
     version="1.0.0",
     description='vantage6 column names algorithm',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/MaastrichtU-BISS/v6-columnnames-py',
+    url='https://github.com/MaastrichtU-BISS/v6-colnames-py',
     packages=find_packages(),
     python_requires='>=3.6',
     install_requires=[
