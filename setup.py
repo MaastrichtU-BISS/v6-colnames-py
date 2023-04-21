@@ -16,7 +16,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 # setup the package
 setup(
     name='v6-colnames-py',
-    version="1.0.0",
+    version="1.0.1",
     description='vantage6 column names algorithm',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -24,7 +24,7 @@ setup(
     packages=find_packages(),
     python_requires='>=3.6',
     install_requires=[
-        'vantage6-client==2.1.0',
+        'vantage6-client==3.8.2',
         'pandas'
     ]
 )
