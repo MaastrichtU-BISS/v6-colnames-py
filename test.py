@@ -1,6 +1,6 @@
 from vantage6.tools.mock_client import ClientMockProtocol
 
-client = ClientMockProtocol(["local/data.csv", "local/data.csv"], "v6-boilerplate-py")
+client = ClientMockProtocol(["local/data.csv", "local/data.csv"], "v6-colnames-py")
 
 # Get all organizations in the collaboration
 organizations = client.get_organizations_in_my_collaboration()
