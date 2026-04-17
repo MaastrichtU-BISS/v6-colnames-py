@@ -25,7 +25,6 @@ setup(
     python_requires='>=3.10',
     install_requires=[
         'pandas>=1.5.3',
-        'vantage6-algorithm-tools==4.14.0',
-        'vantage6-client==4.14.0'
+        'vantage6-algorithm-tools==4.14.0'
     ]
 )

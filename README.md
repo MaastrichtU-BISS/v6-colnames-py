@@ -30,15 +30,28 @@ algorithm-tools interface:
 
 ## Dockerfile contract
 
-For Vantage6 4.x, the image should be started with:
+For Vantage6 4.x, the image only needs Python plus the `wrap_algorithm`
+entrypoint. This repository therefore uses a self-contained Dockerfile and does
+not depend on `harbor2.vantage6.ai/algorithms/algorithm-base`:
 
 ```dockerfile
-FROM harbor2.vantage6.ai/algorithms/algorithm-base
+FROM python:3.10-slim
 
 ARG PKG_NAME="v6-colnames-py"
 
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install \
+        openpyxl>=3.0.0 \
+        pandas>=1.5.3 \
+        pyfiglet==1.0.4 \
+        pyjwt==2.12.1 \
+        SPARQLWrapper>=2.0.0 \
+        sqlalchemy==1.4.46 \
+        vantage6-common==4.14.0 \
+        vantage6-algorithm-tools==4.14.0
+
 COPY . /app
-RUN pip install /app
+RUN pip install --no-deps /app
 
 ENV PKG_NAME=${PKG_NAME}
 
