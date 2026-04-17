@@ -1,5 +1,5 @@
-# basic python3 image as base
-FROM harbor2.vantage6.ai/infrastructure/algorithm-base:3.4.2
+# basic vantage6 algorithm image as base
+FROM harbor2.vantage6.ai/algorithms/algorithm-base
 
 # This is a placeholder that should be overloaded by invoking
 # docker build with '--build-arg PKG_NAME=...'
@@ -11,5 +11,5 @@ RUN pip install /app
 
 ENV PKG_NAME=${PKG_NAME}
 
-# Tell docker to execute `docker_wrapper()` when the image is run.
-CMD python -c "from vantage6.tools.docker_wrapper import docker_wrapper; docker_wrapper('${PKG_NAME}')"
+# Tell docker to execute `wrap_algorithm()` when the image is run.
+CMD python -c "from vantage6.algorithm.tools.wrap import wrap_algorithm; wrap_algorithm()"

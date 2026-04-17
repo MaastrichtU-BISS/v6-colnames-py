@@ -16,14 +16,16 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 # setup the package
 setup(
     name='v6-colnames-py',
-    version="1.0.1",
+    version="2.0.0",
     description='vantage6 column names algorithm',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/MaastrichtU-BISS/v6-colnames-py',
     packages=find_packages(),
-    python_requires='>=3.6',
+    python_requires='>=3.10',
     install_requires=[
-        'vantage6-client'
+        'pandas>=1.5.3',
+        'vantage6-algorithm-tools==4.14.0',
+        'vantage6-client==4.14.0'
     ]
 )

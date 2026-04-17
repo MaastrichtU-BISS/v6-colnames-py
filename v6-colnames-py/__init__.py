@@ -1,79 +1,66 @@
-""" methods.py
-
-This file contains all algorithm pieces that are executed on the nodes.
-It is important to note that the master method is also triggered on a
-node just the same as any other method.
-
-When a return statement is reached the result is send to the central
-server after encryption.
 """
-import time
+Algorithm entrypoints for the Vantage6 column-name discovery workflow.
+"""
 
-from vantage6.tools.util import info, warn
+from vantage6.algorithm.tools.decorators import algorithm_client, data
+from vantage6.algorithm.tools.util import info
 
 
-def master(client, data, *args, **kwargs):
-    """Master algoritm.
-
-    The master algorithm is the chair of the Round Robin, which makes
-    sure everyone waits for their turn to identify themselfs.
+@algorithm_client
+def master(client, *args, **kwargs):
     """
+    Dispatch a child task to every organization in the collaboration and
+    aggregate their column names.
+    """
+    organizations = client.organization.list()
+    organization_ids = [organization["id"] for organization in organizations]
 
-    # get all organizations (ids) that are within the collaboration
-    # FlaskIO knows the collaboration to which the container belongs
-    # as this is encoded in the JWT (Bearer token)
-    organizations = client.get_organizations_in_my_collaboration()
-    ids = [organization.get("id") for organization in organizations]
-
-    # The input fot the algorithm is the same for all organizations
-    # in this case
     info("Defining input parameters")
     input_ = {
         "method": "colnames",
+        "args": [],
+        "kwargs": {},
     }
 
-    # create a new task for all organizations in the collaboration.
     info("Dispatching node-tasks")
-    task = client.create_new_task(
+    task = client.task.create(
         input_=input_,
-        organization_ids=ids
+        organizations=organization_ids,
+        name="Collect column names",
+        description="Retrieve local column names for all organizations",
     )
 
-    # wait for node to return results. Instead of polling it is also
-    # possible to subscribe to a websocket channel to get status
-    # updates
-    info("Waiting for resuls")
-    task_id = task.get("id")
-    task = client.get_task(task_id)
-    while not task.get("complete"):
-        task = client.get_task(task_id)
-        info("Waiting for results")
-        time.sleep(1)
-
+    info("Waiting for results")
+    results = client.wait_for_results(task["id"])
     info("Obtaining results")
-    results = client.get_results(task_id=task.get("id"))
 
-    # Turn this into a nice dictionary along with a set to check which names
-    # the nodes have in common
-    results_dict = {f'node{i}': results[i] for i in range(len(results))}
-    
-    intersect = set(results[0])
-    for result in results:
-        intersect = intersect.intersection(set(result))
+    if not results:
+        return {"common": [], "organizations": {}}
 
-    results_dict['common'] = intersect
+    organizations_result = {}
+    common = set(results[0]["columns"])
+    for result in sorted(results, key=lambda entry: entry["organization_id"]):
+        key = f"organization_{result['organization_id']}"
+        columns = sorted(result["columns"])
+        organizations_result[key] = {
+            "organization_id": result["organization_id"],
+            "node_id": result["node_id"],
+            "columns": columns,
+        }
+        common &= set(columns)
 
-    # return the lists + set
-    return results_dict
+    organizations_result["common"] = sorted(common)
+    return organizations_result
 
-def RPC_colnames(data, *args, **kwargs):
-    """RPC_colnames.
 
-    Do computation on data local to this node and send it back to 
-    central server for further processing.
-
-    In this case simply create a list of columns
+@data()
+@algorithm_client
+def colnames(client, data, *args, **kwargs):
     """
-    result = list(data.columns)
-
-    return result
+    Return the local dataframe column names together with organization metadata.
+    """
+    return {
+        "organization_id": client.organization_id,
+        "node_id": client.node_id,
+        "columns": list(data.columns),
+    }
