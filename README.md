@@ -39,16 +39,25 @@ FROM python:3.10-slim
 
 ARG PKG_NAME="v6-colnames-py"
 
+RUN apt-get update && \
+    apt-get install --yes --no-install-recommends \
+        build-essential \
+        gfortran \
+        libopenblas-dev \
+        liblapack-dev \
+        pkg-config && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN pip install --upgrade pip setuptools wheel && \
     pip install \
-        openpyxl>=3.0.0 \
-        pandas>=1.5.3 \
-        pyfiglet==1.0.4 \
-        pyjwt==2.12.1 \
-        SPARQLWrapper>=2.0.0 \
-        sqlalchemy==1.4.46 \
-        vantage6-common==4.14.0 \
-        vantage6-algorithm-tools==4.14.0
+        "openpyxl>=3.0.0" \
+        "pandas>=1.5.3" \
+        "pyfiglet==1.0.4" \
+        "pyjwt==2.12.1" \
+        "SPARQLWrapper>=2.0.0" \
+        "sqlalchemy==1.4.46" \
+        "vantage6-common==4.14.0" \
+        "vantage6-algorithm-tools==4.14.0"
 
 COPY . /app
 RUN pip install --no-deps /app
